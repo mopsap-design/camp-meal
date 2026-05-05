@@ -71,9 +71,8 @@
 
 <!-- ========== ここを書き換えてください ========== -->
 <script>
-  const SUPABASE_URL = "rvuqydpsnlhmrxvdiewd";
-  const SUPABASE_KEY = "sb_publishable_evHWJDVFsYAHe8rUJDxUfQ_z8ASf_1v";   
-</script>
+  const SUPABASE_URL = "https://rvuqydpsnlhmrxvdiewd.supabase.co";   // 
+  const SUPABASE_KEY = "sb_publishable_evHWJDVFsYAHe8rUJDxUfQ_z8ASf_1v";   </script>
 <!-- ============================================= -->
 
 <script>
@@ -91,13 +90,13 @@ const DEFAULT_CONFIG = {
 const MEAL_LABELS = ["朝", "昼", "夕"];
 const CONFIG_KEY = "camp_config";
 
-let supabase, config = null, responses = {};
+let db, config = null, responses = {};
 let currentView = "answer";
 let currentMember = null, currentAttend = true, currentMeals = {};
 
 // ====== 初期化 ======
 window.addEventListener("DOMContentLoaded", async () => {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   config = loadLocalConfig();
   await fetchResponses();
   render();
@@ -113,7 +112,7 @@ function saveLocalConfig(cfg) {
 
 async function fetchResponses() {
   try {
-    const { data } = await supabase.from("responses").select("*");
+    const { data } = await db.from("responses").select("*");
     responses = {};
     (data || []).forEach(r => { responses[r.member] = r; });
   } catch(e) { console.error(e); }
@@ -121,7 +120,7 @@ async function fetchResponses() {
 
 async function upsertResponse(member, attend, meals) {
   const payload = { member, attend, meals, updated_at: new Date().toISOString() };
-  await supabase.from("responses").upsert(payload, { onConflict: "member" });
+  await db.from("responses").upsert(payload, { onConflict: "member" });
   responses[member] = payload;
 }
 
