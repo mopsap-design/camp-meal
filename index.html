@@ -99,17 +99,20 @@ let currentMember = null, currentAttend = true, currentMeals = {};
 // ====== 初期化 ======
 window.addEventListener("DOMContentLoaded", async () => {
   db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  config = loadLocalConfig();
+  config = (await loadRemoteConfig()) || DEFAULT_CONFIG;
   await fetchResponses();
   render();
 });
 
-function loadLocalConfig() {
-  try { return JSON.parse(localStorage.getItem(CONFIG_KEY)) || DEFAULT_CONFIG; } catch { return DEFAULT_CONFIG; }
+async function loadRemoteConfig() {
+  try {
+    const { data } = await db.from("config").select("value").eq("key", "camp_config").single();
+    return data ? JSON.parse(data.value) : null;
+  } catch { return null; }
 }
-function saveLocalConfig(cfg) {
-  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+async function saveRemoteConfig(cfg) {
   config = cfg;
+  await db.from("config").upsert({ key: "camp_config", value: JSON.stringify(cfg) }, { onConflict: "key" });
 }
 
 async function fetchResponses() {
@@ -361,10 +364,10 @@ function attachEvents() {
   });
 
   // 設定：基本
-  document.getElementById("saveBasic")?.addEventListener("click", () => {
+  document.getElementById("saveBasic")?.addEventListener("click", async () => {
     config.title = document.getElementById("s-title").value;
-    saveLocalConfig(config);
-    showToast("保存しました");
+    await saveRemoteConfig(config);
+    showToast("保存しました ✅");
     render();
   });
 
@@ -374,7 +377,7 @@ function attachEvents() {
     if (!v || config.dates.includes(v)) return;
     config.dates.push(v);
     config.meals[v] = { 朝: true, 昼: true, 夕: true };
-    saveLocalConfig(config); render();
+    saveRemoteConfig(config).then(() => render());
   });
 
   // 設定：日程削除
@@ -383,7 +386,7 @@ function attachEvents() {
       const d = btn.dataset.date;
       config.dates = config.dates.filter(x => x !== d);
       delete config.meals[d];
-      saveLocalConfig(config); render();
+      saveRemoteConfig(config).then(() => render());
     });
   });
 
@@ -392,7 +395,7 @@ function attachEvents() {
     btn.addEventListener("click", () => {
       const d = btn.dataset.date, ml = btn.dataset.meal;
       config.meals[d][ml] = !config.meals[d][ml];
-      saveLocalConfig(config); render();
+      saveRemoteConfig(config).then(() => render());
     });
   });
 
@@ -401,14 +404,14 @@ function attachEvents() {
     const v = document.getElementById("new-member").value.trim();
     if (!v || config.members.includes(v)) return;
     config.members.push(v);
-    saveLocalConfig(config); render();
+    saveRemoteConfig(config).then(() => render());
   });
 
   // 設定：メンバー削除
   document.querySelectorAll(".remove-member").forEach(btn => {
     btn.addEventListener("click", () => {
       config.members = config.members.filter(x => x !== btn.dataset.member);
-      saveLocalConfig(config); render();
+      saveRemoteConfig(config).then(() => render());
     });
   });
 }
