@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap');
-  :root { --blue:#3a86c8; --green:#4caf7d; --red:#e05a5a; --bg:#f0f7ff; }
+  :root { --blue:#3a86c8; --green:#4caf7d; --red:#e05a5a; --orange:#e8893a; --bg:#f0f7ff; }
   * { box-sizing:border-box; margin:0; padding:0; }
   body { font-family:'M PLUS Rounded 1c',sans-serif; background:var(--bg); min-height:100vh; }
   .nav { display:flex; background:#fff; border-bottom:2px solid #e0ecf8; position:sticky; top:0; z-index:10; }
@@ -21,8 +21,11 @@
   .hero p { font-size:13px; opacity:.85; }
   .sec-title { font-size:14px; font-weight:900; color:var(--blue); margin-bottom:10px; }
   .member-grid { display:flex; flex-wrap:wrap; gap:8px; }
-  .member-btn { padding:10px 14px; border:2px solid #d0e4f5; border-radius:10px; background:#fff; font-family:inherit; font-size:13px; font-weight:700; color:#2a3a4a; cursor:pointer; }
+  .member-btn { padding:10px 14px; border:2px solid #d0e4f5; border-radius:10px; background:#fff; font-family:inherit; font-size:13px; font-weight:700; color:#2a3a4a; cursor:pointer; display:flex; align-items:center; gap:5px; }
   .member-btn.done { background:#e8f7ef; border-color:var(--green); color:#2d6a4f; }
+  .mtag { font-size:10px; font-weight:700; padding:1px 5px; border-radius:5px; }
+  .mtag.adult { background:#eef4fb; color:var(--blue); }
+  .mtag.child { background:#fdf3e9; color:var(--orange); }
   .toggle-row { display:flex; gap:8px; }
   .ton { flex:1; padding:12px 0; border:none; border-radius:10px; background:var(--green); color:#fff; font-family:inherit; font-size:15px; font-weight:900; cursor:pointer; }
   .ton.red { background:var(--red); }
@@ -31,6 +34,8 @@
   .date-label { font-size:13px; font-weight:700; color:#555; min-width:80px; }
   .mon { padding:8px 14px; border:none; border-radius:8px; background:var(--green); color:#fff; font-family:inherit; font-size:13px; font-weight:900; cursor:pointer; }
   .moff { padding:8px 14px; border:2px solid #d0e4f5; border-radius:8px; background:#fff; color:#bbb; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+  .stayon { padding:8px 16px; border:none; border-radius:8px; background:#6a5acd; color:#fff; font-family:inherit; font-size:13px; font-weight:900; cursor:pointer; }
+  .stayoff { padding:8px 16px; border:2px solid #d0e4f5; border-radius:8px; background:#fff; color:#bbb; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; }
   .btn-primary { padding:14px; border:none; border-radius:12px; background:var(--blue); color:#fff; font-family:inherit; font-size:15px; font-weight:900; cursor:pointer; width:100%; margin-top:8px; }
   .back-btn { width:36px; height:36px; border:2px solid #d0e4f5; border-radius:10px; background:#fff; font-size:18px; cursor:pointer; color:var(--blue); }
   .form-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
@@ -40,8 +45,8 @@
   .sbox { flex:1; min-width:60px; text-align:center; padding:10px 8px; border:2px solid; border-radius:12px; background:#fafcff; }
   .snum { font-size:22px; font-weight:900; }
   .slbl { font-size:11px; color:#888; margin-top:2px; }
-  .mcard { background:#f0f7ff; border-radius:10px; padding:10px 16px; text-align:center; min-width:64px; }
-  .mnum { font-size:26px; font-weight:900; color:var(--blue); line-height:1.2; }
+  .mcard { background:#f0f7ff; border-radius:10px; padding:10px 14px; text-align:center; min-width:104px; }
+  .mnum { font-size:24px; font-weight:900; line-height:1.1; }
   .mlbl { font-size:11px; color:#888; }
   .mrow { display:flex; align-items:center; padding:8px 0; border-bottom:1px solid #f0f4f8; flex-wrap:wrap; gap:6px; }
   .sbadge { font-size:11px; padding:2px 8px; border-radius:6px; font-weight:700; margin-left:6px; }
@@ -50,11 +55,39 @@
   .toast.show { opacity:1; }
   input[type=text] { padding:8px 12px; border:1.5px solid #d0e4f5; border-radius:8px; font-family:inherit; font-size:13px; outline:none; }
   .setting-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f0f4f8; font-size:14px; }
-  .chip { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; background:#f0f6ff; border-radius:8px; border:1.5px solid #d0e4f5; font-size:12px; }
+  .chip { display:inline-flex; align-items:center; gap:6px; padding:5px 8px 5px 10px; background:#f0f6ff; border-radius:8px; border:1.5px solid #d0e4f5; font-size:12px; }
+  .chip-type { border:none; border-radius:6px; padding:2px 7px; cursor:pointer; font-family:inherit; font-size:10px; font-weight:700; }
+  .chip-type.adult { background:#eef4fb; color:var(--blue); }
+  .chip-type.child { background:#fdf3e9; color:var(--orange); }
   .chip-x { border:none; background:none; cursor:pointer; color:#aaa; font-size:14px; padding:0; line-height:1; }
   .btn-small { padding:8px 14px; border:none; border-radius:8px; background:var(--blue); color:#fff; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; }
   .btn-danger { padding:10px 16px; border:none; border-radius:8px; background:var(--red); color:#fff; font-family:inherit; font-size:14px; font-weight:900; cursor:pointer; white-space:nowrap; }
   .rbtn { border:none; background:#fdf0f0; color:var(--red); border-radius:6px; padding:2px 7px; cursor:pointer; font-weight:700; font-size:13px; }
+  .sbox.clickable { cursor:pointer; transition:transform .08s; }
+  .sbox.clickable:active { transform:scale(.96); }
+  .sbox.active { box-shadow:0 0 0 3px rgba(58,134,200,.25); }
+  .flist-name { display:inline-flex; align-items:center; gap:5px; padding:6px 10px; background:#f7fbff; border:1px solid #e0ecf8; border-radius:8px; font-size:13px; font-weight:700; margin:3px; }
+  #printArea { display:none; }
+  @media print {
+    body { background:#fff; }
+    .nav, #app, .toast { display:none !important; }
+    @page { size: A4 portrait; margin: 10mm; }
+    #printArea { display:block !important; color:#000; font-size:9px; line-height:1.35; }
+    #printArea h2 { font-size:15px; margin:0 0 1px; }
+    #printArea .psub { font-size:9px; color:#333; margin-bottom:6px; }
+    #printArea .pstat { display:flex; gap:5px; margin-bottom:8px; }
+    #printArea .pstat-box { flex:1; border:1px solid #888; border-radius:5px; padding:4px 6px; text-align:center; font-size:8.5px; }
+    #printArea .pstat-box b { font-size:15px; display:block; line-height:1.1; margin:1px 0; }
+    #printArea .proster-wrap { column-count:3; column-gap:7mm; }
+    #printArea .pgh { font-size:10px; margin:0 0 2px; border-left:4px solid #3a86c8; padding-left:6px; break-after:avoid; }
+    #printArea .pnames { font-size:9px; margin-bottom:7px; }
+    #printArea .pchild { color:#b35a16; font-size:8px; }
+    #printArea h3.mt { font-size:10px; margin:8px 0 2px; border-left:4px solid #3a86c8; padding-left:6px; }
+    #printArea table.ptbl { width:100%; border-collapse:collapse; font-size:8.5px; }
+    #printArea table.ptbl th, #printArea table.ptbl td { border:1px solid #888; padding:2px 5px; text-align:left; }
+    #printArea table.ptbl th { background:#eef4fb; }
+    #printArea tr { break-inside:avoid; }
+  }
 </style>
 </head>
 <body>
@@ -71,16 +104,33 @@ const DEFAULT_CONFIG = {
     "7/27(日)": { 朝:true,  昼:true, 夕:true },
     "7/28(月)": { 朝:true,  昼:true, 夕:false },
   },
-  members: ["田中 太郎", "鈴木 花子", "佐藤 健"],
+  members: [
+    {name:"田中 太郎", type:"adult"},
+    {name:"鈴木 花子", type:"adult"},
+    {name:"佐藤 健",   type:"child"},
+  ],
 };
 const ML = ["朝","昼","夕"];
 
-let DB, cfg, responses = {}, curView = "answer", selMember = null, selAttend = true, selMeals = {};
+let DB, cfg, responses = {}, curView = "answer", selMember = null, selAttend = true, selMeals = {}, adminFilter = null;
+
+/* ===== メンバー型ヘルパー（文字列の旧データも大人として扱う） ===== */
+function memName(m){ return typeof m === "string" ? m : m.name; }
+function memType(m){ return (typeof m === "object" && m.type === "child") ? "child" : "adult"; }
+function memTypeOf(name){ const m=cfg.members.find(x=>memName(x)===name); return m?memType(m):"adult"; }
+function normalizeMembers(){
+  cfg.members = (cfg.members||[]).map(m =>
+    typeof m === "string" ? {name:m, type:"adult"} : {name:m.name, type:(m.type==="child"?"child":"adult")}
+  );
+}
+/* 宿泊する夜＝最終日を除く各日（例：7/26泊・7/27泊） */
+function nights(){ return cfg.dates.length > 1 ? cfg.dates.slice(0, -1) : []; }
 
 window.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("app").innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:80vh;flex-direction:column;gap:12px;color:#888;font-size:14px'>🏕️<br>読み込み中...</div>";
   DB = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   cfg = await loadCfg();
+  normalizeMembers();
   await loadRes();
   render();
 });
@@ -136,15 +186,16 @@ function render() {
 function renderAnswer() {
   if (!selMember) {
     const btns = cfg.members.map(m => {
-      const done = !!responses[m];
-      return `<button class="member-btn${done?' done':''}" data-m="${m}">${done?'✅ ':''}${m}</button>`;
+      const name = memName(m), t = memType(m), done = !!responses[name];
+      return `<button class="member-btn${done?' done':''}" data-m="${name}">${done?'✅ ':''}${name}<span class="mtag ${t}">${t==='child'?'子':'大'}</span></button>`;
     }).join("");
     return `<div class="page">
-      <div class="hero"><div class="emoji">🏕️</div><h1>${cfg.title}</h1><p>出欠・食事の確認</p></div>
+      <div class="hero"><div class="emoji">🏕️</div><h1>${cfg.title}</h1><p>出欠・食事・宿泊の確認</p></div>
       <div class="card"><div class="sec-title">あなたの名前を選んでください</div>
       <div class="member-grid">${btns}</div></div></div>`;
   }
-  const rows = cfg.dates.map(date => {
+  const t = memTypeOf(selMember);
+  const mealRows = cfg.dates.map(date => {
     const avail = ML.filter(ml => cfg.meals[date]?.[ml]);
     if (!avail.length) return "";
     const btns = avail.map(ml => {
@@ -153,10 +204,15 @@ function renderAnswer() {
     }).join("");
     return `<div class="date-row"><span class="date-label">${date}</span><div style="display:flex;gap:6px">${btns}</div></div>`;
   }).join("");
+  const nl = nights();
+  const stayRows = nl.map(d => {
+    const key = `stay_${d}`, on = selAttend && selMeals[key];
+    return `<div class="date-row"><span class="date-label">${d} 泊</span><button class="${on?'stayon':'stayoff'} mt" data-key="${key}">🛏️ 宿泊する</button></div>`;
+  }).join("");
   return `<div class="page"><div class="card">
     <div class="form-header">
       <button class="back-btn" id="backBtn">←</button>
-      <div><div style="font-size:18px;font-weight:900">${selMember}</div><div style="font-size:12px;color:#888">回答フォーム</div></div>
+      <div><div style="font-size:18px;font-weight:900">${selMember}<span class="mtag ${t}" style="margin-left:6px">${t==='child'?'子供':'大人'}</span></div><div style="font-size:12px;color:#888">回答フォーム</div></div>
     </div>
     <div style="margin-bottom:16px">
       <div class="sec-title">参加しますか？</div>
@@ -165,59 +221,107 @@ function renderAnswer() {
         <button class="${!selAttend?'ton red':'toff'}" id="attN">不参加 ✗</button>
       </div>
     </div>
-    ${selAttend?`<div style="margin-bottom:16px"><div class="sec-title">食事の確認（緑＝食べる）</div>${rows}</div>`:''}
+    ${selAttend?`<div style="margin-bottom:16px"><div class="sec-title">🍱 食事の確認（緑＝食べる）</div>${mealRows}</div>`:''}
+    ${selAttend && stayRows?`<div style="margin-bottom:16px"><div class="sec-title">🛏️ 宿泊の確認（泊まる夜を選ぶ）</div>${stayRows}</div>`:''}
     <button class="btn-primary" id="submitBtn">送信する →</button>
   </div></div>`;
 }
 
 function renderAdmin() {
-  const total=cfg.members.length, answered=cfg.members.filter(m=>responses[m]).length;
-  const attending=cfg.members.filter(m=>responses[m]?.attend).length;
-  const absent=cfg.members.filter(m=>responses[m]&&!responses[m].attend).length;
-  const pct=total?Math.round(answered/total*100):0;
-  const mealCards=cfg.dates.map(date=>{
-    const avail=ML.filter(ml=>cfg.meals[date]?.[ml]); if(!avail.length)return"";
-    const cards=avail.map(ml=>{
-      const key=`${date}_${ml}`, count=cfg.members.filter(m=>responses[m]?.attend&&responses[m]?.meals?.[key]).length;
-      return `<div class="mcard"><div class="mlbl">${ml}食</div><div class="mnum">${count}</div><div class="mlbl">人</div></div>`;
+  const attendingMembers = cfg.members.filter(m => responses[memName(m)]?.attend);
+  const total = cfg.members.length;
+  const answered = cfg.members.filter(m => responses[memName(m)]).length;
+  const attending = attendingMembers.length;
+  const absent = cfg.members.filter(m => { const r=responses[memName(m)]; return r && !r.attend; }).length;
+  const adultsAtt = attendingMembers.filter(m => memType(m)==='adult').length;
+  const childrenAtt = attendingMembers.filter(m => memType(m)==='child').length;
+  const pct = total ? Math.round(answered/total*100) : 0;
+
+  const mealCards = cfg.dates.map(date => {
+    const avail = ML.filter(ml => cfg.meals[date]?.[ml]); if(!avail.length) return "";
+    const cards = avail.map(ml => {
+      const key = `${date}_${ml}`;
+      const a = attendingMembers.filter(m => memType(m)==='adult' && responses[memName(m)]?.meals?.[key]).length;
+      const c = attendingMembers.filter(m => memType(m)==='child' && responses[memName(m)]?.meals?.[key]).length;
+      return `<div class="mcard"><div class="mlbl" style="margin-bottom:4px">${ml}食 <span style="font-weight:900;color:#2a3a4a">計${a+c}</span></div>
+        <div style="display:flex;gap:10px;justify-content:center">
+          <div><div class="mnum" style="color:var(--blue)">${a}</div><div class="mlbl">大人</div></div>
+          <div><div class="mnum" style="color:var(--orange)">${c}</div><div class="mlbl">子供</div></div>
+        </div></div>`;
     }).join("");
     return `<div style="margin-bottom:12px"><div class="date-label">${date}</div><div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">${cards}</div></div>`;
   }).join("");
-  const mrows=cfg.members.map(m=>{
-    const r=responses[m];
-    let badge=`<span class="sbadge" style="background:#f5f5f5;color:#aaa">未回答</span>`,tags="";
-    if(r){
-      badge=r.attend?`<span class="sbadge" style="background:#e8f7ef;color:#2d6a4f">参加</span>`:`<span class="sbadge" style="background:#fdf0f0;color:#e05a5a">不参加</span>`;
-      if(r.attend)tags=cfg.dates.map(d=>ML.filter(ml=>cfg.meals[d]?.[ml]).map(ml=>{
-        const key=`${d}_${ml}`,on=r.meals?.[key];
-        return `<span style="font-size:10px;padding:2px 5px;border-radius:4px;font-weight:700;background:${on?'#4caf7d':'#f0f0f0'};color:${on?'white':'#bbb'}">${ml}</span>`;
-      }).join("")).join("");
-    }
-    return `<div class="mrow"><div style="flex:1"><span style="font-size:13px;font-weight:700">${m}</span>${badge}</div><div style="display:flex;gap:4px;flex-wrap:wrap">${tags}</div></div>`;
+
+  const nl = nights();
+  const stayCards = nl.map(d => {
+    const key = `stay_${d}`;
+    const a = attendingMembers.filter(m => memType(m)==='adult' && responses[memName(m)]?.meals?.[key]).length;
+    const c = attendingMembers.filter(m => memType(m)==='child' && responses[memName(m)]?.meals?.[key]).length;
+    return `<div class="mcard"><div class="mlbl" style="margin-bottom:4px">${d}泊 <span style="font-weight:900;color:#2a3a4a">計${a+c}</span></div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <div><div class="mnum" style="color:var(--blue)">${a}</div><div class="mlbl">大人</div></div>
+        <div><div class="mnum" style="color:var(--orange)">${c}</div><div class="mlbl">子供</div></div>
+      </div></div>`;
   }).join("");
+
+  const mrows = cfg.members.map(m => {
+    const name = memName(m), t = memType(m), r = responses[name];
+    const typeBadge = `<span class="mtag ${t}" style="margin-left:6px">${t==='child'?'子供':'大人'}</span>`;
+    let badge = `<span class="sbadge" style="background:#f5f5f5;color:#aaa">未回答</span>`, tags="";
+    if (r) {
+      badge = r.attend ? `<span class="sbadge" style="background:#e8f7ef;color:#2d6a4f">参加</span>` : `<span class="sbadge" style="background:#fdf0f0;color:#e05a5a">不参加</span>`;
+      if (r.attend) {
+        const mealTags = cfg.dates.map(d => ML.filter(ml=>cfg.meals[d]?.[ml]).map(ml=>{
+          const on = r.meals?.[`${d}_${ml}`];
+          return `<span style="font-size:10px;padding:2px 5px;border-radius:4px;font-weight:700;background:${on?'#4caf7d':'#f0f0f0'};color:${on?'white':'#bbb'}">${ml}</span>`;
+        }).join("")).join("");
+        const stayTags = nl.map(d=>{
+          const on = r.meals?.[`stay_${d}`];
+          return `<span style="font-size:10px;padding:2px 5px;border-radius:4px;font-weight:700;background:${on?'#6a5acd':'#f0f0f0'};color:${on?'white':'#bbb'}">${d.replace(/\(.*\)/,'')}泊</span>`;
+        }).join("");
+        tags = mealTags + stayTags;
+      }
+    }
+    return `<div class="mrow"><div style="flex:1"><span style="font-size:13px;font-weight:700">${name}</span>${typeBadge}${badge}</div><div style="display:flex;gap:4px;flex-wrap:wrap">${tags}</div></div>`;
+  }).join("");
+
   return `<div class="page">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div class="sec-title">📊 回答状況</div><button class="refresh-btn" id="refreshBtn">更新</button>
+        <div class="sec-title">📊 回答状況</div><div style="display:flex;gap:6px"><button class="refresh-btn" id="printBtn">🖨️ 印刷</button><button class="refresh-btn" id="refreshBtn">更新</button></div>
       </div>
       <div class="summary-grid">
-        <div class="sbox" style="border-color:#3a86c8"><div class="snum" style="color:#3a86c8">${answered}/${total}</div><div class="slbl">回答済</div></div>
-        <div class="sbox" style="border-color:#4caf7d"><div class="snum" style="color:#4caf7d">${attending}</div><div class="slbl">参加</div></div>
-        <div class="sbox" style="border-color:#e05a5a"><div class="snum" style="color:#e05a5a">${absent}</div><div class="slbl">不参加</div></div>
-        <div class="sbox" style="border-color:#aaa"><div class="snum" style="color:#aaa">${total-answered}</div><div class="slbl">未回答</div></div>
+        <div class="sbox clickable${adminFilter==='answered'?' active':''}" data-filter="answered" style="border-color:#3a86c8"><div class="snum" style="color:#3a86c8">${answered}/${total}</div><div class="slbl">回答済</div></div>
+        <div class="sbox clickable${adminFilter==='attending'?' active':''}" data-filter="attending" style="border-color:#4caf7d"><div class="snum" style="color:#4caf7d">${attending}</div><div class="slbl">参加</div></div>
+        <div class="sbox clickable${adminFilter==='absent'?' active':''}" data-filter="absent" style="border-color:#e05a5a"><div class="snum" style="color:#e05a5a">${absent}</div><div class="slbl">不参加</div></div>
+        <div class="sbox clickable${adminFilter==='unanswered'?' active':''}" data-filter="unanswered" style="border-color:#aaa"><div class="snum" style="color:#aaa">${total-answered}</div><div class="slbl">未回答</div></div>
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-      <div style="font-size:12px;color:#888;text-align:right;margin-top:4px">${answered}/${total}人 回答済</div>
+      <div style="font-size:12px;color:#888;text-align:right;margin-top:4px">${answered}/${total}人 回答済 ・ カウントを押すと該当者が出ます</div>
+      ${adminFilter?renderFilterList(adminFilter):''}
     </div>
-    <div class="card"><div class="sec-title">🍱 食数集計</div>${mealCards}</div>
+
+    <div class="card"><div class="sec-title">🍪 おやつ・参加人数（内訳）</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="mcard"><div class="mlbl" style="margin-bottom:4px">参加合計 <span style="font-weight:900;color:#2a3a4a">${attending}</span></div>
+          <div style="display:flex;gap:10px;justify-content:center">
+            <div><div class="mnum" style="color:var(--blue)">${adultsAtt}</div><div class="mlbl">大人</div></div>
+            <div><div class="mnum" style="color:var(--orange)">${childrenAtt}</div><div class="mlbl">子供</div></div>
+          </div></div>
+      </div>
+      <div style="font-size:11px;color:#888;margin-top:8px">おやつは「子供 ${childrenAtt}人」を目安に用意できます（大人分が必要なら大人 ${adultsAtt}人も参照）。</div>
+    </div>
+
+    <div class="card"><div class="sec-title">🍱 食数集計（大人／子供）</div>${mealCards||'<div style="font-size:12px;color:#888">食事の日程がありません</div>'}</div>
+    <div class="card"><div class="sec-title">🛏️ 宿泊集計（大人／子供）</div>${stayCards||'<div style="font-size:12px;color:#888">宿泊する夜がありません（日程が1日のみ）</div>'}</div>
     <div class="card"><div class="sec-title">👥 個人一覧</div>${mrows}</div>
   </div>`;
 }
 
 function renderSettings() {
-  const dateRows=cfg.dates.map(d=>{
-    const mbtns=ML.map(ml=>{
-      const on=cfg.meals[d]?.[ml];
+  const dateRows = cfg.dates.map(d => {
+    const mbtns = ML.map(ml => {
+      const on = cfg.meals[d]?.[ml];
       return `<button class="${on?'mon':'moff'} mst" data-date="${d}" data-meal="${ml}">${ml}</button>`;
     }).join("");
     return `<div style="padding:10px 0;border-bottom:1px solid #f0f4f8">
@@ -226,7 +330,14 @@ function renderSettings() {
         <button class="rbtn rdate" data-date="${d}">×</button>
       </div><div style="display:flex;gap:8px">${mbtns}</div></div>`;
   }).join("");
-  const chips=cfg.members.map(m=>`<div class="chip">${m}<button class="chip-x rmember" data-m="${m}">×</button></div>`).join("");
+  const adultCount = cfg.members.filter(m=>memType(m)==='adult').length;
+  const childCount = cfg.members.filter(m=>memType(m)==='child').length;
+  const chips = cfg.members.map(m => {
+    const name = memName(m), t = memType(m);
+    return `<div class="chip">${name}
+      <button class="chip-type ${t} mtype" data-m="${name}">${t==='child'?'子供':'大人'}</button>
+      <button class="chip-x rmember" data-m="${name}">×</button></div>`;
+  }).join("");
   return `<div class="page">
     <div class="card">
       <div class="sec-title">⚙️ 基本設定</div>
@@ -235,7 +346,7 @@ function renderSettings() {
     </div>
     <div class="card">
       <div class="sec-title">📅 日程・食事</div>
-      <div style="font-size:11px;color:#e05a5a;background:#fdf0f0;border-radius:8px;padding:8px 10px;margin-bottom:10px">⚠️ 日程を追加・削除すると、回答（参加・食事）はすべてリセットされます。</div>
+      <div style="font-size:11px;color:#e05a5a;background:#fdf0f0;border-radius:8px;padding:8px 10px;margin-bottom:10px">⚠️ 日程を追加・削除すると、回答（参加・食事・宿泊）はすべてリセットされます。<br>宿泊する夜は、最終日を除く各日が自動で対象になります。</div>
       ${dateRows}
       <div style="display:flex;gap:8px;margin-top:10px">
         <input type="text" id="new-date" placeholder="例: 7/29(火)" style="flex:1">
@@ -243,27 +354,38 @@ function renderSettings() {
       </div>
     </div>
     <div class="card">
-      <div class="sec-title">👥 メンバー（${cfg.members.length}人）</div>
+      <div class="sec-title">👥 メンバー（大人${adultCount}・子供${childCount}）</div>
+      <div style="font-size:11px;color:#888;margin-bottom:8px">名前の横の「大人／子供」を押すと切り替えできます。</div>
       <div class="member-grid" style="margin-bottom:12px">${chips}</div>
       <div style="display:flex;gap:8px">
         <input type="text" id="new-member" placeholder="名前" style="flex:1">
-        <button class="btn-small" id="addMember">＋追加</button>
+        <button class="btn-small" id="addAdult">＋大人</button>
+        <button class="btn-small" id="addChild" style="background:var(--orange)">＋子供</button>
       </div>
     </div>
     <div class="card">
       <div class="sec-title">🔄 回答のリセット</div>
-      <div style="font-size:12px;color:#888;margin-bottom:10px">すべての回答（参加・不参加・食事）を消去します。メンバー名簿と日程は残ります。この操作は取り消せません。</div>
+      <div style="font-size:12px;color:#888;margin-bottom:10px">すべての回答（参加・食事・宿泊）を消去します。メンバー名簿と日程は残ります。この操作は取り消せません。</div>
       <button class="btn-danger" id="resetAll">🔄 全回答をリセット</button>
     </div>
   </div>`;
 }
 
+async function addMemberWithType(type){
+  const input = document.getElementById("new-member");
+  const v = input.value.trim();
+  if (!v || cfg.members.some(m=>memName(m)===v)) return;
+  cfg.members.push({name:v, type});
+  await saveCfg();
+  render();
+}
+
 function bindEvents() {
   document.querySelectorAll(".member-btn").forEach(b=>b.addEventListener("click",()=>{
-    selMember=b.dataset.m;
-    const r=responses[selMember];
-    selAttend=r?r.attend:true;
-    selMeals=r?.meals?{...r.meals}:initMeals(true);
+    selMember = b.dataset.m;
+    const r = responses[selMember];
+    selAttend = r ? r.attend : true;
+    selMeals = r?.meals ? {...r.meals} : initMeals(true);
     render();
   }));
   document.getElementById("backBtn")?.addEventListener("click",()=>{selMember=null;render();});
@@ -278,6 +400,11 @@ function bindEvents() {
     else{toast("送信失敗。もう一度お試しください");btn.textContent="送信する →";btn.disabled=false;}
   });
   document.getElementById("refreshBtn")?.addEventListener("click",async()=>{await loadRes();render();toast("更新しました");});
+  document.getElementById("printBtn")?.addEventListener("click",printRoster);
+  document.querySelectorAll(".sbox.clickable").forEach(b=>b.addEventListener("click",()=>{
+    const f=b.dataset.filter; adminFilter = (adminFilter===f ? null : f); render();
+  }));
+  document.getElementById("closeFilter")?.addEventListener("click",()=>{adminFilter=null;render();});
   document.getElementById("saveBasic")?.addEventListener("click",async()=>{
     cfg.title=document.getElementById("s-title").value;await saveCfg();toast("保存しました ✅");render();
   });
@@ -298,13 +425,14 @@ function bindEvents() {
   document.querySelectorAll(".mst").forEach(b=>b.addEventListener("click",async()=>{
     cfg.meals[b.dataset.date][b.dataset.meal]=!cfg.meals[b.dataset.date][b.dataset.meal];await saveCfg();render();
   }));
-  document.getElementById("addMember")?.addEventListener("click",async()=>{
-    const v=document.getElementById("new-member").value.trim();
-    if(!v||cfg.members.includes(v))return;
-    cfg.members.push(v);await saveCfg();render();
-  });
+  document.getElementById("addAdult")?.addEventListener("click",()=>addMemberWithType("adult"));
+  document.getElementById("addChild")?.addEventListener("click",()=>addMemberWithType("child"));
+  document.querySelectorAll(".mtype").forEach(b=>b.addEventListener("click",async()=>{
+    const m=cfg.members.find(x=>memName(x)===b.dataset.m);
+    if(m){ m.type = memType(m)==='child' ? 'adult' : 'child'; await saveCfg(); render(); }
+  }));
   document.querySelectorAll(".rmember").forEach(b=>b.addEventListener("click",async()=>{
-    cfg.members=cfg.members.filter(x=>x!==b.dataset.m);await saveCfg();render();
+    cfg.members=cfg.members.filter(x=>memName(x)!==b.dataset.m);await saveCfg();render();
   }));
   document.getElementById("resetAll")?.addEventListener("click",async()=>{
     if(!confirm("本当にすべての回答をリセットしますか？\nこの操作は取り消せません。"))return;
@@ -314,9 +442,78 @@ function bindEvents() {
   });
 }
 
+function renderFilterList(filter){
+  let list, label;
+  if(filter==='answered'){ list=cfg.members.filter(m=>responses[memName(m)]); label='回答済'; }
+  else if(filter==='attending'){ list=cfg.members.filter(m=>responses[memName(m)]?.attend); label='参加'; }
+  else if(filter==='absent'){ list=cfg.members.filter(m=>{const r=responses[memName(m)];return r&&!r.attend;}); label='不参加'; }
+  else { list=cfg.members.filter(m=>!responses[memName(m)]); label='未回答'; }
+  const names = list.length
+    ? list.map(m=>{const t=memType(m);return `<span class="flist-name">${memName(m)}<span class="mtag ${t}">${t==='child'?'子':'大'}</span></span>`;}).join("")
+    : '<div style="font-size:12px;color:#888">該当者はいません</div>';
+  return `<div style="margin-top:14px;border-top:1px dashed #d0e4f5;padding-top:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-size:13px;font-weight:900;color:#2a3a4a">「${label}」の該当者（${list.length}名）</div>
+      <button class="refresh-btn" id="closeFilter">閉じる</button>
+    </div><div>${names}</div></div>`;
+}
+
+function mealSummaryTable(){
+  const att=cfg.members.filter(m=>responses[memName(m)]?.attend);
+  const rows=[];
+  cfg.dates.forEach(d=>ML.filter(ml=>cfg.meals[d]?.[ml]).forEach(ml=>{
+    const key=`${d}_${ml}`;
+    const a=att.filter(m=>memType(m)==='adult'&&responses[memName(m)]?.meals?.[key]).length;
+    const c=att.filter(m=>memType(m)==='child'&&responses[memName(m)]?.meals?.[key]).length;
+    rows.push(`<tr><td>${d} ${ml}食</td><td>${a}</td><td>${c}</td><td>${a+c}</td></tr>`);
+  }));
+  nights().forEach(d=>{
+    const key=`stay_${d}`;
+    const a=att.filter(m=>memType(m)==='adult'&&responses[memName(m)]?.meals?.[key]).length;
+    const c=att.filter(m=>memType(m)==='child'&&responses[memName(m)]?.meals?.[key]).length;
+    rows.push(`<tr><td>${d} 宿泊</td><td>${a}</td><td>${c}</td><td>${a+c}</td></tr>`);
+  });
+  if(!rows.length) return '<div style="font-size:12px;color:#666">対象なし</div>';
+  return `<table class="ptbl"><thead><tr><th>項目</th><th style="width:60px">大人</th><th style="width:60px">子供</th><th style="width:60px">合計</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
+}
+
+function buildPrintHTML(){
+  const now=new Date();
+  const stamp=`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 時点`;
+  const att=cfg.members.filter(m=>responses[memName(m)]?.attend);
+  const abs=cfg.members.filter(m=>{const r=responses[memName(m)];return r&&!r.attend;});
+  const non=cfg.members.filter(m=>!responses[memName(m)]);
+  const total=cfg.members.length;
+  const answered=cfg.members.filter(m=>responses[memName(m)]).length;
+  const aA=att.filter(m=>memType(m)==='adult').length, aC=att.filter(m=>memType(m)==='child').length;
+  const fmt=(arr)=> arr.length
+    ? arr.map(m=>{const nm=memName(m); return memType(m)==='child' ? `${nm}<span class="pchild">(子)</span>` : nm;}).join("、")
+    : 'なし';
+  return `<h2>${cfg.title}</h2>
+    <div class="psub">${stamp}</div>
+    <div class="pstat">
+      <div class="pstat-box">回答済<b>${answered}/${total}</b></div>
+      <div class="pstat-box">参加<b>${att.length}</b>大人${aA}・子供${aC}</div>
+      <div class="pstat-box">不参加<b>${abs.length}</b></div>
+      <div class="pstat-box">未回答<b>${non.length}</b></div>
+    </div>
+    <div class="proster-wrap">
+      <h3 class="pgh">参加者（${att.length}名）</h3><div class="pnames">${fmt(att)}</div>
+      <h3 class="pgh">不参加者（${abs.length}名）</h3><div class="pnames">${fmt(abs)}</div>
+      <h3 class="pgh">未回答者（${non.length}名）</h3><div class="pnames">${fmt(non)}</div>
+    </div>
+    <h3 class="mt">食数・宿泊 集計</h3>${mealSummaryTable()}`;
+}
+
+function printRoster(){
+  document.getElementById("printArea").innerHTML = buildPrintHTML();
+  window.print();
+}
+
 function initMeals(on){
   const m={};
   cfg.dates.forEach(d=>ML.forEach(ml=>{if(cfg.meals[d]?.[ml])m[`${d}_${ml}`]=on;}));
+  nights().forEach(d=>{ m[`stay_${d}`]=on; });
   return m;
 }
 function toast(msg){
@@ -332,6 +529,7 @@ function toast(msg){
   <button id="nav-settings" onclick="showView('settings')">⚙️ 設定</button>
 </nav>
 <div id="app"></div>
+<div id="printArea"></div>
 <div class="toast" id="toast"></div>
 
 </body>
