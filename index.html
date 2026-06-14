@@ -574,4 +574,52 @@ function buildPrintHTML(){
   const non=cfg.members.filter(m=>!responses[memName(m)]);
   const total=cfg.members.length;
   const answered=cfg.members.filter(m=>responses[memName(m)]).length;
-  const aA=att.filter(m=>memType(m)==='adult').length, aC=att.filter(m=>memType(m)==='ch
+  const aA=att.filter(m=>memType(m)==='adult').length, aC=att.filter(m=>memType(m)==='child').length;
+  const fmt=(arr)=> arr.length
+    ? arr.map(m=>{const nm=memName(m); return memType(m)==='child' ? `${nm}<span class="pchild">(隊)</span>` : nm;}).join("、")
+    : 'なし';
+  return `<h2>${cfg.title}</h2>
+    <div class="psub">${stamp}</div>
+    <div class="pstat">
+      <div class="pstat-box">回答済<b>${answered}/${total}</b></div>
+      <div class="pstat-box">参加<b>${att.length}</b>スタッフ${aA}・隊員${aC}</div>
+      <div class="pstat-box">不参加<b>${abs.length}</b></div>
+      <div class="pstat-box">未回答<b>${non.length}</b></div>
+    </div>
+    <div class="proster-wrap">
+      <h3 class="pgh">参加者（${att.length}名）</h3><div class="pnames">${fmt(att)}</div>
+      <h3 class="pgh">不参加者（${abs.length}名）</h3><div class="pnames">${fmt(abs)}</div>
+      <h3 class="pgh">未回答者（${non.length}名）</h3><div class="pnames">${fmt(non)}</div>
+    </div>
+    <h3 class="mt">食数・宿泊 集計</h3>${mealSummaryTable()}`;
+}
+
+function printRoster(){
+  document.getElementById("printArea").innerHTML = buildPrintHTML();
+  window.print();
+}
+
+function initMeals(on){
+  const m={};
+  cfg.dates.forEach(d=>ML.forEach(ml=>{if(cfg.meals[d]?.[ml])m[`${d}_${ml}`]=on;}));
+  nights().forEach(d=>{ m[`stay_${d}`]=on; });
+  return m;
+}
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2500);
+}
+</script>
+
+<nav class="nav">
+  <button id="nav-answer" class="active" onclick="showView('answer')">✏️ 回答</button>
+  <button id="nav-admin" onclick="showView('admin')">📊 集計</button>
+  <button id="nav-settings" onclick="showView('settings')">⚙️ 設定</button>
+</nav>
+<div id="app"></div>
+<div id="printArea"></div>
+<div class="toast" id="toast"></div>
+
+</body>
+</html>
