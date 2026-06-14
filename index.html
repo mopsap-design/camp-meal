@@ -121,7 +121,7 @@ const ML = ["朝","昼","夕"];
 
 let DB, cfg, responses = {}, curView = "answer", selMember = null, selAttend = true, selMeals = {}, adminFilter = null;
 
-/* ===== メンバー型ヘルパー（文字列の旧データもスタッフとして扱う） ===== */
+/* ===== メンバー型ヘルパー（文字列の旧データも係員として扱う） ===== */
 function memName(m){ return typeof m === "string" ? m : m.name; }
 function memType(m){ return (typeof m === "object" && m.type === "child") ? "child" : "adult"; }
 function memTypeOf(name){ const m=cfg.members.find(x=>memName(x)===name); return m?memType(m):"adult"; }
@@ -194,7 +194,7 @@ function renderAnswer() {
   if (!selMember) {
     const btns = cfg.members.map(m => {
       const name = memName(m), t = memType(m), done = !!responses[name];
-      return `<button class="member-btn${done?' done':''}" data-m="${name}">${done?'✅ ':''}${name}<span class="mtag ${t}">${t==='child'?'隊':'ス'}</span></button>`;
+      return `<button class="member-btn${done?' done':''}" data-m="${name}">${done?'✅ ':''}${name}<span class="mtag ${t}">${t==='child'?'隊':'係'}</span></button>`;
     }).join("");
     return `<div class="page">
       <div class="hero"><div class="emoji">🏕️</div><h1>${cfg.title}</h1><p>出欠・食事・宿泊の確認</p></div>
@@ -219,7 +219,7 @@ function renderAnswer() {
   return `<div class="page"><div class="card">
     <div class="form-header">
       <button class="back-btn" id="backBtn">←</button>
-      <div><div style="font-size:18px;font-weight:900">${selMember}<span class="mtag ${t}" style="margin-left:6px">${t==='child'?'隊員':'スタッフ'}</span></div><div style="font-size:12px;color:#888">回答フォーム</div></div>
+      <div><div style="font-size:18px;font-weight:900">${selMember}<span class="mtag ${t}" style="margin-left:6px">${t==='child'?'隊員':'係員'}</span></div><div style="font-size:12px;color:#888">回答フォーム</div></div>
     </div>
     <div style="margin-bottom:16px">
       <div class="sec-title">参加しますか？</div>
@@ -252,7 +252,7 @@ function renderAdmin() {
       const c = attendingMembers.filter(m => memType(m)==='child' && responses[memName(m)]?.meals?.[key]).length;
       return `<div class="mcard"><div class="mlbl" style="margin-bottom:4px">${ml}食 <span class="fcell${adminFilter===('meal:'+key+':all')?' active':''}" data-filter="meal:${key}:all" style="font-weight:900;color:#2a3a4a">計${a+c}</span></div>
         <div style="display:flex;gap:10px;justify-content:center">
-          <div class="fcell${adminFilter===('meal:'+key+':adult')?' active':''}" data-filter="meal:${key}:adult"><div class="mnum" style="color:var(--blue)">${a}</div><div class="mlbl">スタッフ</div></div>
+          <div class="fcell${adminFilter===('meal:'+key+':adult')?' active':''}" data-filter="meal:${key}:adult"><div class="mnum" style="color:var(--blue)">${a}</div><div class="mlbl">係員</div></div>
           <div class="fcell${adminFilter===('meal:'+key+':child')?' active':''}" data-filter="meal:${key}:child"><div class="mnum" style="color:var(--orange)">${c}</div><div class="mlbl">隊員</div></div>
         </div></div>`;
     }).join("");
@@ -266,14 +266,14 @@ function renderAdmin() {
     const c = attendingMembers.filter(m => memType(m)==='child' && responses[memName(m)]?.meals?.[key]).length;
     return `<div class="mcard"><div class="mlbl" style="margin-bottom:4px">${d}泊 <span class="fcell${adminFilter===('stay:'+key+':all')?' active':''}" data-filter="stay:${key}:all" style="font-weight:900;color:#2a3a4a">計${a+c}</span></div>
       <div style="display:flex;gap:10px;justify-content:center">
-        <div class="fcell${adminFilter===('stay:'+key+':adult')?' active':''}" data-filter="stay:${key}:adult"><div class="mnum" style="color:var(--blue)">${a}</div><div class="mlbl">スタッフ</div></div>
+        <div class="fcell${adminFilter===('stay:'+key+':adult')?' active':''}" data-filter="stay:${key}:adult"><div class="mnum" style="color:var(--blue)">${a}</div><div class="mlbl">係員</div></div>
         <div class="fcell${adminFilter===('stay:'+key+':child')?' active':''}" data-filter="stay:${key}:child"><div class="mnum" style="color:var(--orange)">${c}</div><div class="mlbl">隊員</div></div>
       </div></div>`;
   }).join("");
 
   const mrows = cfg.members.map(m => {
     const name = memName(m), t = memType(m), r = responses[name];
-    const typeBadge = `<span class="mtag ${t}" style="margin-left:6px">${t==='child'?'隊員':'スタッフ'}</span>`;
+    const typeBadge = `<span class="mtag ${t}" style="margin-left:6px">${t==='child'?'隊員':'係員'}</span>`;
     let badge = `<span class="sbadge" style="background:#f5f5f5;color:#aaa">未回答</span>`, tags="";
     if (r) {
       badge = r.attend ? `<span class="sbadge" style="background:#e8f7ef;color:#2d6a4f">参加</span>` : `<span class="sbadge" style="background:#fdf0f0;color:#e05a5a">不参加</span>`;
@@ -312,7 +312,7 @@ function renderAdmin() {
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <div class="mcard"><div class="mlbl" style="margin-bottom:4px">参加合計 <span class="fcell${adminFilter==='attending'?' active':''}" data-filter="attending" style="font-weight:900;color:#2a3a4a">${attending}</span></div>
           <div style="display:flex;gap:10px;justify-content:center">
-            <div class="fcell${adminFilter==='snack:adult'?' active':''}" data-filter="snack:adult"><div class="mnum" style="color:var(--blue)">${adultsAtt}</div><div class="mlbl">スタッフ</div></div>
+            <div class="fcell${adminFilter==='snack:adult'?' active':''}" data-filter="snack:adult"><div class="mnum" style="color:var(--blue)">${adultsAtt}</div><div class="mlbl">係員</div></div>
             <div class="fcell${adminFilter==='snack:child'?' active':''}" data-filter="snack:child"><div class="mnum" style="color:var(--orange)">${childrenAtt}</div><div class="mlbl">隊員</div></div>
           </div></div>
       </div>
@@ -320,8 +320,8 @@ function renderAdmin() {
       ${filterSection(adminFilter)==='snack'?renderFilterList(adminFilter):''}
     </div>
 
-    <div class="card"><div class="sec-title">🍱 食数集計（スタッフ／隊員）</div><div style="font-size:11px;color:#888;margin-bottom:8px">数字を押すと該当者が出ます</div>${mealCards||'<div style="font-size:12px;color:#888">食事の日程がありません</div>'}${filterSection(adminFilter)==='meal'?renderFilterList(adminFilter):''}</div>
-    <div class="card"><div class="sec-title">🛏️ 宿泊集計（スタッフ／隊員）</div><div style="font-size:11px;color:#888;margin-bottom:8px">数字を押すと該当者が出ます</div>${stayCards||'<div style="font-size:12px;color:#888">宿泊する夜がありません（日程が1日のみ）</div>'}${filterSection(adminFilter)==='stay'?renderFilterList(adminFilter):''}</div>
+    <div class="card"><div class="sec-title">🍱 食数集計（係員／隊員）</div><div style="font-size:11px;color:#888;margin-bottom:8px">数字を押すと該当者が出ます</div>${mealCards||'<div style="font-size:12px;color:#888">食事の日程がありません</div>'}${filterSection(adminFilter)==='meal'?renderFilterList(adminFilter):''}</div>
+    <div class="card"><div class="sec-title">🛏️ 宿泊集計（係員／隊員）</div><div style="font-size:11px;color:#888;margin-bottom:8px">数字を押すと該当者が出ます</div>${stayCards||'<div style="font-size:12px;color:#888">宿泊する夜がありません（日程が1日のみ）</div>'}${filterSection(adminFilter)==='stay'?renderFilterList(adminFilter):''}</div>
     <div class="card"><div class="sec-title">👥 個人一覧</div>${mrows}</div>
   </div>`;
 }
@@ -343,7 +343,7 @@ function renderSettings() {
   const chips = cfg.members.map(m => {
     const name = memName(m), t = memType(m);
     return `<div class="chip" data-m="${name}"><span class="chip-handle">≡</span>${name}
-      <button class="chip-type ${t} mtype" data-m="${name}">${t==='child'?'隊員':'スタッフ'}</button>
+      <button class="chip-type ${t} mtype" data-m="${name}">${t==='child'?'隊員':'係員'}</button>
       <button class="chip-x rmember" data-m="${name}">×</button></div>`;
   }).join("");
   return `<div class="page">
@@ -362,12 +362,12 @@ function renderSettings() {
       </div>
     </div>
     <div class="card">
-      <div class="sec-title">👥 メンバー（スタッフ${adultCount}・隊員${childCount}）</div>
-      <div style="font-size:11px;color:#888;margin-bottom:8px">名前の横の「スタッフ／隊員」を押すと切り替えできます。</div>
+      <div class="sec-title">👥 メンバー（係員${adultCount}・隊員${childCount}）</div>
+      <div style="font-size:11px;color:#888;margin-bottom:8px">名前の横の「係員／隊員」を押すと切り替えできます。</div>
       <div class="member-grid" id="member-chips-list" style="margin-bottom:12px">${chips}</div>
       <div style="display:flex;gap:8px">
         <input type="text" id="new-member" placeholder="名前" style="flex:1">
-        <button class="btn-small" id="addAdult">＋スタッフ</button>
+        <button class="btn-small" id="addAdult">＋係員</button>
         <button class="btn-small" id="addChild" style="background:var(--orange)">＋隊員</button>
       </div>
     </div>
@@ -480,28 +480,28 @@ function resolveFilter(filter){
   if(filter==='attending') return {list:att, label:'参加'};
   if(filter==='absent') return {list:cfg.members.filter(m=>{const r=responses[memName(m)];return r&&!r.attend;}), label:'不参加'};
   if(filter==='unanswered') return {list:cfg.members.filter(m=>!responses[memName(m)]), label:'未回答'};
-  if(filter==='snack:adult') return {list:att.filter(m=>memType(m)==='adult'), label:'参加（スタッフ）'};
+  if(filter==='snack:adult') return {list:att.filter(m=>memType(m)==='adult'), label:'参加（係員）'};
   if(filter==='snack:child') return {list:att.filter(m=>memType(m)==='child'), label:'参加（隊員）'};
   if(filter.indexOf('meal:')===0){
     const p=filter.split(':'), key=p[1], sub=p[2];
     let l=att.filter(m=>responses[memName(m)]?.meals?.[key]);
     if(sub==='adult') l=l.filter(m=>memType(m)==='adult');
     if(sub==='child') l=l.filter(m=>memType(m)==='child');
-    return {list:l, label:`${key.replace('_',' ')}食${sub==='adult'?'・スタッフ':sub==='child'?'・隊員':''}`};
+    return {list:l, label:`${key.replace('_',' ')}食${sub==='adult'?'・係員':sub==='child'?'・隊員':''}`};
   }
   if(filter.indexOf('stay:')===0){
     const p=filter.split(':'), key=p[1], sub=p[2], d=key.replace('stay_','');
     let l=att.filter(m=>responses[memName(m)]?.meals?.[key]);
     if(sub==='adult') l=l.filter(m=>memType(m)==='adult');
     if(sub==='child') l=l.filter(m=>memType(m)==='child');
-    return {list:l, label:`${d} 宿泊${sub==='adult'?'・スタッフ':sub==='child'?'・隊員':''}`};
+    return {list:l, label:`${d} 宿泊${sub==='adult'?'・係員':sub==='child'?'・隊員':''}`};
   }
   return {list:[], label:''};
 }
 function renderFilterList(filter){
   const {list,label}=resolveFilter(filter);
   const names = list.length
-    ? list.map(m=>{const t=memType(m);return `<span class="flist-name">${memName(m)}<span class="mtag ${t}">${t==='child'?'隊':'ス'}</span></span>`;}).join("")
+    ? list.map(m=>{const t=memType(m);return `<span class="flist-name">${memName(m)}<span class="mtag ${t}">${t==='child'?'隊':'係'}</span></span>`;}).join("")
     : '<div style="font-size:12px;color:#888">該当者はいません</div>';
   return `<div style="margin-top:14px;border-top:1px dashed #d0e4f5;padding-top:12px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -528,7 +528,7 @@ function mealSummaryTable(){
     rows.push(`<tr><td>${d} 宿泊</td><td>${sl.length}</td><td>${cl.length}</td><td>${sl.length+cl.length}</td></tr><tr><td colspan="4" style="font-size:7.5px;color:#444;padding:1px 4px 4px 10px">${names}</td></tr>`);
   });
   if(!rows.length) return '<div style="font-size:12px;color:#666">対象なし</div>';
-  return `<table class="ptbl"><thead><tr><th>項目</th><th style="width:50px">スタッフ</th><th style="width:50px">隊員</th><th style="width:50px">合計</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
+  return `<table class="ptbl"><thead><tr><th>項目</th><th style="width:50px">係員</th><th style="width:50px">隊員</th><th style="width:50px">合計</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
 }
 
 function buildPrintHTML(){
@@ -547,7 +547,7 @@ function buildPrintHTML(){
     <div class="psub">${stamp}</div>
     <div class="pstat">
       <div class="pstat-box">回答済<b>${answered}/${total}</b></div>
-      <div class="pstat-box">参加<b>${att.length}</b>スタッフ${aA}・隊員${aC}</div>
+      <div class="pstat-box">参加<b>${att.length}</b>係員${aA}・隊員${aC}</div>
       <div class="pstat-box">不参加<b>${abs.length}</b></div>
       <div class="pstat-box">未回答<b>${non.length}</b></div>
     </div>
