@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>合宿 出欠・食数管理</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1/Sortable.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap');
   :root { --blue:#3a86c8; --green:#4caf7d; --red:#e05a5a; --orange:#e8893a; --bg:#f0f7ff; }
@@ -60,6 +61,9 @@
   .chip-type.adult { background:#eef4fb; color:var(--blue); }
   .chip-type.child { background:#fdf3e9; color:var(--orange); }
   .chip-x { border:none; background:none; cursor:pointer; color:#aaa; font-size:14px; padding:0; line-height:1; }
+  .chip-handle { color:#ccc; font-size:15px; cursor:grab; padding:0 3px 0 0; line-height:1; touch-action:none; }
+  .chip-handle:active { cursor:grabbing; }
+  .chip.sortable-ghost { opacity:.35; background:#dceeff; }
   .btn-small { padding:8px 14px; border:none; border-radius:8px; background:var(--blue); color:#fff; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; }
   .btn-danger { padding:10px 16px; border:none; border-radius:8px; background:var(--red); color:#fff; font-family:inherit; font-size:14px; font-weight:900; cursor:pointer; white-space:nowrap; }
   .rbtn { border:none; background:#fdf0f0; color:var(--red); border-radius:6px; padding:2px 7px; cursor:pointer; font-weight:700; font-size:13px; }
@@ -338,7 +342,7 @@ function renderSettings() {
   const childCount = cfg.members.filter(m=>memType(m)==='child').length;
   const chips = cfg.members.map(m => {
     const name = memName(m), t = memType(m);
-    return `<div class="chip">${name}
+    return `<div class="chip" data-m="${name}"><span class="chip-handle">≡</span>${name}
       <button class="chip-type ${t} mtype" data-m="${name}">${t==='child'?'子供':'大人'}</button>
       <button class="chip-x rmember" data-m="${name}">×</button></div>`;
   }).join("");
@@ -360,7 +364,7 @@ function renderSettings() {
     <div class="card">
       <div class="sec-title">👥 メンバー（大人${adultCount}・子供${childCount}）</div>
       <div style="font-size:11px;color:#888;margin-bottom:8px">名前の横の「大人／子供」を押すと切り替えできます。</div>
-      <div class="member-grid" style="margin-bottom:12px">${chips}</div>
+      <div class="member-grid" id="member-chips-list" style="margin-bottom:12px">${chips}</div>
       <div style="display:flex;gap:8px">
         <input type="text" id="new-member" placeholder="名前" style="flex:1">
         <button class="btn-small" id="addAdult">＋大人</button>
@@ -442,6 +446,19 @@ function bindEvents() {
   document.querySelectorAll(".rmember").forEach(b=>b.addEventListener("click",async()=>{
     cfg.members=cfg.members.filter(x=>memName(x)!==b.dataset.m);await saveCfg();render();
   }));
+  const chipList = document.getElementById("member-chips-list");
+  if (chipList && window.Sortable) {
+    new Sortable(chipList, {
+      animation: 150,
+      handle: ".chip-handle",
+      ghostClass: "sortable-ghost",
+      onEnd: async () => {
+        const newOrder = [...chipList.querySelectorAll(".chip")].map(el => el.dataset.m);
+        cfg.members = newOrder.map(name => cfg.members.find(m => memName(m) === name));
+        await saveCfg();
+      }
+    });
+  }
   document.getElementById("resetAll")?.addEventListener("click",async()=>{
     if(!confirm("本当にすべての回答をリセットしますか？\nこの操作は取り消せません。"))return;
     const ok=await resetAllResponses();
