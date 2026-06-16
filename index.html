@@ -243,16 +243,18 @@ function renderAdmin() {
   const pct = total ? Math.round(answered/total*100) : 0;
   const nl = nights();
 
+  const fc = f => `fcell${adminFilter===f?' active':''}`;
+
   const mealCards = cfg.dates.map(date => {
     const avail = ML.filter(ml => cfg.meals[date]?.[ml]); if(!avail.length) return "";
     const cards = avail.map(ml => {
       const key = `${date}_${ml}`;
       const s = cfg.members.filter(m => memType(m)==='adult' && responses[memName(m)]?.meals?.[key]).length;
       const c = cfg.members.filter(m => memType(m)==='child' && responses[memName(m)]?.meals?.[key]).length;
-      return `<div class="mcard"><div class="mlbl" style="margin-bottom:4px">${ml}食 <span style="font-weight:900;color:#2a3a4a">計${s+c}</span></div>
+      return `<div class="mcard"><div class="mlbl" style="margin-bottom:4px">${ml}食 <span class="${fc('meal:'+key)}" data-filter="meal:${key}" style="font-weight:900;color:#2a3a4a">計${s+c}</span></div>
         <div style="display:flex;gap:10px;justify-content:center">
-          <div><div class="mnum" style="color:var(--blue)">${s}</div><div class="mlbl">スタッフ</div></div>
-          <div><div class="mnum" style="color:var(--orange)">${c}</div><div class="mlbl">隊員</div></div>
+          <div class="${fc('meal:'+key+':adult')}" data-filter="meal:${key}:adult"><div class="mnum" style="color:var(--blue)">${s}</div><div class="mlbl">スタッフ</div></div>
+          <div class="${fc('meal:'+key+':child')}" data-filter="meal:${key}:child"><div class="mnum" style="color:var(--orange)">${c}</div><div class="mlbl">隊員</div></div>
         </div></div>`;
     }).join("");
     return `<div style="margin-bottom:12px"><div class="date-label" style="font-weight:700;font-size:13px;color:#555">${date}</div><div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">${cards}</div></div>`;
@@ -263,12 +265,12 @@ function renderAdmin() {
       const key = `stay_${d}`;
       const s = cfg.members.filter(m => memType(m)==='adult' && responses[memName(m)]?.meals?.[key]).length;
       const c = cfg.members.filter(m => memType(m)==='child' && responses[memName(m)]?.meals?.[key]).length;
-      return `<div class="mcard"><div class="mlbl" style="margin-bottom:4px">${d}泊 <span style="font-weight:900;color:#2a3a4a">計${s+c}</span></div>
+      return `<div class="mcard"><div class="mlbl" style="margin-bottom:4px">${d}泊 <span class="${fc('stay:'+key)}" data-filter="stay:${key}" style="font-weight:900;color:#2a3a4a">計${s+c}</span></div>
         <div style="display:flex;gap:10px;justify-content:center">
-          <div><div class="mnum" style="color:var(--blue)">${s}</div><div class="mlbl">スタッフ</div></div>
-          <div><div class="mnum" style="color:var(--orange)">${c}</div><div class="mlbl">隊員</div></div>
+          <div class="${fc('stay:'+key+':adult')}" data-filter="stay:${key}:adult"><div class="mnum" style="color:var(--blue)">${s}</div><div class="mlbl">スタッフ</div></div>
+          <div class="${fc('stay:'+key+':child')}" data-filter="stay:${key}:child"><div class="mnum" style="color:var(--orange)">${c}</div><div class="mlbl">隊員</div></div>
         </div></div>`;
-    }).join("")}</div></div>` : '';
+    }).join("")}</div>${filterSection(adminFilter)==='stay'?renderFilterList(adminFilter):''}</div>` : '';
 
   const mrows = cfg.members.map(m => {
     const name = memName(m), t = memType(m), r = responses[name];
@@ -291,11 +293,12 @@ function renderAdmin() {
         <div class="sec-title">📊 回答状況</div>
         <div style="display:flex;gap:6px"><button class="refresh-btn" id="printBtn">🖨️ 印刷</button><button class="refresh-btn" id="refreshBtn">更新</button></div>
       </div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:6px">回答済 <span style="color:var(--blue);font-size:20px;font-weight:900">${answered}</span> / ${total}名
-        <span style="font-size:12px;color:#aaa;margin-left:8px">未回答 ${total-answered}名</span></div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px">回答済 <span class="${fc('answered')}" data-filter="answered" style="color:var(--blue);font-size:20px;font-weight:900">${answered}</span> / ${total}名
+        <span class="${fc('unanswered')}" data-filter="unanswered" style="font-size:12px;color:#aaa;margin-left:8px">未回答 ${total-answered}名</span></div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      ${filterSection(adminFilter)==='status'?renderFilterList(adminFilter):''}
     </div>
-    <div class="card"><div class="sec-title">🍱 食数集計（スタッフ／隊員）</div>${mealCards||'<div style="font-size:12px;color:#888">食事の日程がありません</div>'}</div>
+    <div class="card"><div class="sec-title">🍱 食数集計（スタッフ／隊員）</div>${mealCards||'<div style="font-size:12px;color:#888">食事の日程がありません</div>'}${filterSection(adminFilter)==='meal'?renderFilterList(adminFilter):''}</div>
     ${staySection}
     <div class="card"><div class="sec-title">👥 個人一覧</div>${mrows}</div>
   </div>`;
